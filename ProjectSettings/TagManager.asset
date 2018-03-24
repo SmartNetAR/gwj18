@@ -3,7 +3,9 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Pared
+  - Ground
   layers:
   - Default
   - TransparentFX
@@ -41,12 +43,12 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ground_Back
+    uniqueID: 1906280089
+    locked: 0
   - name: People
     uniqueID: 1169399341
     locked: 0
-  - name: New Layer
+  - name: Wall
     uniqueID: 2796265635
-    locked: 0
-  - name: New Layer
-    uniqueID: 1906280089
     locked: 0

@@ -3,64 +3,76 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
-	public int m_Id;
-	public float m_Speed;
 
-	private Rigidbody2D rb2D;
-	private bool grounded = false;
 
-	private string m_MovementAxisName;
-	private string m_JumpName;
+	public float maxSpeed = 5f;
+	public float speed = 10f;
+	public float jumpPower = 6.5f;
 
-	void Start() {
-		m_MovementAxisName = "Horizontal" + m_Id;
-		m_JumpName = "Jump" + m_Id;
-		rb2D = GetComponent<Rigidbody2D> ();
+	private Rigidbody2D rb2d;
+	//private Animator anim;
+	private bool jump;
+	private bool grounded;
+
+
+
+	// Use this for initialization
+	void Start () {
+		rb2d = GetComponent<Rigidbody2D> ();
+		//anim = GetComponent<Animator> ();
+	}
+
+	void Update () {
+		//anim.SetFloat ("Speed", Mathf.Abs (rb2d.velocity.x));
+
+		//if ( Input.GetKeyDown (KeyCode.UpArrow) && grounded ) {
+		if ( Input.GetAxis("Vertical1") > 0.2 && grounded ) {
+			jump = true;
+		}
+	}
+
+	public void ItsOnTheGround( bool boolValue ) {
+		grounded = boolValue;
+		//anim.SetBool ("Grounded", boolValue);
 	}
 
 	void FixedUpdate () {
-		RunAxis ();
-		Jump ();
 
+		DisminuirVelocidad ();
+
+		float h = Input.GetAxis ("Horizontal1");
+
+		rb2d.AddForce (Vector2.right * speed * h);
+
+		//limita la velocidad Clamp devuelve filtrada entre un minimo y un maximo
+		float limitedSpeed = Mathf.Clamp( rb2d.velocity.x, -maxSpeed, maxSpeed);
+		rb2d.velocity = new Vector2 (limitedSpeed, rb2d.velocity.y);
+
+		//Dar vuelta el player
+		if (h > 0.1f) {
+			transform.localScale = new Vector3 (1f, 1f, 1f);
+		}
+		if (h < -0.1f) {
+			transform.localScale = new Vector3 (-1f, 1f, 1f);
+		}
+
+		//saltar
+		if (jump) {
+			rb2d.velocity = new Vector2 (rb2d.velocity.x, 0f); // cancela el impulso antes decimal volver a saltar
+			rb2d.AddForce (Vector2.up * jumpPower, ForceMode2D.Impulse);
+			jump = false;
+		}			
 	}
 
-	void RunAxis() {
-		float horizontalMovment = Input.GetAxis (m_MovementAxisName);
-			if (GetComponent<SpriteRenderer>().flipX) {
-				GetComponent<SpriteRenderer> ().flipX = false;
-			}
-			transform.Translate ( horizontalMovment * m_Speed * Time.deltaTime, 0, 0) ;
-
-		/* 
-		if ( Input.GetAxis("Horizontal") < -0.1f ) {
-			if (!GetComponent<SpriteRenderer>().flipX) {
-				GetComponent<SpriteRenderer> ().flipX = true;
-			}
-			transform.Translate ( -0.1f * m_Speed, 0, 0) ;
-		}
-		*/
+	void OnBecameInvisible () {
+		transform.position = new Vector3 (-1f, 0f, 0f);
 	}
 
-	void RunGetKey() {
-		if (Input.GetKey(KeyCode.RightArrow) )			{
-			if (GetComponent<SpriteRenderer>().flipX) {
-				GetComponent<SpriteRenderer> ().flipX = false;
-			}
-			transform.Translate ( 0.1f * m_Speed, 0, 0) ;
-		}
-		if (Input.GetKey(KeyCode.LeftArrow) ) {
-			if (!GetComponent<SpriteRenderer>().flipX) {
-				GetComponent<SpriteRenderer> ().flipX = true;
-			}
-			transform.Translate ( -0.1f * m_Speed, 0, 0) ;
+	void DisminuirVelocidad () {
+		Vector3 fixedVelocity = rb2d.velocity;
+		fixedVelocity.x *= 0.75f;
+		if (grounded) {
+			rb2d.velocity = fixedVelocity;
 		}
 	}
-
-	void Jump() {
-		if ( Input.GetAxis(m_JumpName) > 0f ) {
-			rb2D.velocity = new Vector2 (rb2D.velocity.x, 10f);
-		}
-	}
-
-	
 }

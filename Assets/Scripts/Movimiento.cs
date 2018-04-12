@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Movimiento : MonoBehaviour {
 	//public Collider2D sceneTop;
+	public Transform[] m_Players;
 	public float speed = 8f;
 	public Camera camera;
 	public float pubTargetCameraMovment = 300f;
